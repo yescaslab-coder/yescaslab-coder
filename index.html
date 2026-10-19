@@ -1,1 +1,920 @@
-0a
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color" content="#123b8b">
+  <meta name="description" content="MonitoreoV5: monitoreo de temperatura de refrigeradores industriales, gráficas históricas y soporte técnico para múltiples sucursales.">
+
+  <title>MonitoreoV5 | Monitoreo inteligente de temperatura</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+
+  <!-- ENCABEZADO -->
+  <header class="header">
+    <nav class="nav container" aria-label="Navegación principal">
+
+      <a class="brand" href="#inicio" aria-label="MonitoreoV5, inicio">
+        <span class="brand-logo" aria-hidden="true">
+          <!-- Logo provisional -->
+          <svg viewBox="0 0 48 48" fill="none">
+            <path d="M24 5L27.5 12L35 9L34 17L42 20L36 26L40 33L31 33L27 42L21 35L13 39L14 30L6 26L12 20L9 12L18 14L24 5Z"
+              fill="currentColor" opacity=".15"/>
+            <path d="M24 8V39M10 16L38 32M10 32L38 16"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="7" fill="#F28C28"/>
+            <circle cx="24" cy="24" r="3" fill="white"/>
+          </svg>
+        </span>
+
+        <span class="brand-text">
+          <strong>MonitoreoV5</strong>
+          <small>CONTROL INTELIGENTE</small>
+        </span>
+      </a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="navLinks"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="#beneficios">Beneficios</a>
+        <a href="#funcionalidades">Funcionalidades</a>
+        <a href="#planes">Planes</a>
+        <a href="#contacto">Contacto</a>
+
+        <a class="login-link" href="/login5.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="10" width="16" height="11" rx="2"/>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+            <circle cx="12" cy="15" r="1.3"/>
+            <path d="M12 16.5V18"/>
+          </svg>
+          Iniciar sesión
+        </a>
+      </div>
+
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- PORTADA -->
+    <section class="hero" id="inicio">
+      <div class="container">
+
+        <div class="hero-grid">
+
+          <div class="hero-content reveal">
+
+            <div class="eyebrow">
+              <span class="status-dot"></span>
+              MONITOREO PARA REFRIGERACIÓN INDUSTRIAL
+            </div>
+
+            <h1>
+              La temperatura bajo control.
+              <span>Tu operación, un paso adelante.</span>
+            </h1>
+
+            <p class="hero-description">
+              Supervisa la temperatura de tus refrigeradores industriales
+              desde una sola plataforma. Consulta gráficas históricas,
+              identifica comportamientos fuera de lo habitual y facilita
+              la atención de tu equipo de soporte técnico.
+            </p>
+
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#contacto">
+                Solicitar una demostración
+                <span aria-hidden="true">→</span>
+              </a>
+
+              <a class="btn btn-secondary" href="#funcionalidades">
+                Conocer la plataforma
+              </a>
+            </div>
+
+            <div class="hero-trust">
+              <span class="check-icon" aria-hidden="true">✓</span>
+              <p>
+                Diseñado para múltiples sucursales, sensores y equipos
+                de refrigeración industrial.
+              </p>
+            </div>
+
+          </div>
+
+          <!-- PANEL DEMOSTRATIVO -->
+          <div class="dashboard-wrap reveal">
+
+            <div class="dashboard">
+
+              <div class="dashboard-header">
+                <div>
+                  <span class="dashboard-label">VISTA PREVIA</span>
+                  <h2>Panel de temperatura</h2>
+                </div>
+
+                <span class="demo-badge">DATOS DE EJEMPLO</span>
+              </div>
+
+              <div class="dashboard-toolbar">
+                <span>Sucursal demostrativa</span>
+                <span class="filter-label">Sensor #001</span>
+              </div>
+
+              <div class="metrics-grid">
+
+                <article class="metric-card">
+                  <span>Temperatura actual</span>
+                  <strong id="currentTemperature">-18.4 °C</strong>
+                  <small>Lectura ilustrativa</small>
+                </article>
+
+                <article class="metric-card">
+                  <span>Última actualización</span>
+                  <strong>5 min</strong>
+                  <small>Intervalo de referencia</small>
+                </article>
+
+              </div>
+
+              <div class="chart-card">
+
+                <div class="chart-header">
+                  <div>
+                    <h3>Historial de temperatura</h3>
+                    <p>Variación durante el periodo seleccionado</p>
+                  </div>
+
+                  <strong class="temperature-value">°C</strong>
+                </div>
+
+                <div class="chart-legend">
+                  <span></span>
+                  Temperatura registrada (demostración)
+                </div>
+
+                <div class="chart-container">
+                  <canvas
+                    id="temperatureChart"
+                    role="img"
+                    aria-label="Gráfica ilustrativa de temperatura histórica"
+                  >
+                    Gráfica de demostración de temperatura.
+                  </canvas>
+                </div>
+
+                <div class="chart-periods" aria-label="Periodo de la gráfica">
+                  <button type="button" data-hours="12" aria-pressed="false">
+                    12 h
+                  </button>
+
+                  <button
+                    type="button"
+                    data-hours="24"
+                    class="active"
+                    aria-pressed="true"
+                  >
+                    24 h
+                  </button>
+
+                  <button type="button" data-hours="36" aria-pressed="false">
+                    36 h
+                  </button>
+                </div>
+
+              </div>
+
+              <div class="dashboard-footer">
+                <span>● Vista demostrativa</span>
+                <span>Valores simulados, no son datos reales</span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="hero-strip">
+          <span>MÚLTIPLES SUCURSALES</span>
+          <span class="strip-divider"></span>
+          <span>DISTINTAS MARCAS DE SENSORES</span>
+          <span class="strip-divider"></span>
+          <span>HISTORIAL DESCARGABLE</span>
+          <span class="strip-divider"></span>
+          <span>SOPORTE TÉCNICO</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- BENEFICIOS -->
+    <section class="section" id="beneficios">
+      <div class="container">
+
+        <div class="section-heading reveal">
+          <span class="eyebrow">¿POR QUÉ MONITOREOV5?</span>
+
+          <h2>
+            Más visibilidad.
+            <span>Mejores decisiones.</span>
+          </h2>
+
+          <p>
+            Centraliza la información de tus equipos de refrigeración
+            y facilita el trabajo de quienes mantienen tu operación funcionando.
+          </p>
+        </div>
+
+        <div class="benefits-grid">
+
+          <article class="benefit-card reveal">
+            <div class="benefit-icon blue-icon" aria-hidden="true">⌁</div>
+
+            <h3>Temperaturas en un solo lugar</h3>
+
+            <p>
+              Consulta gráficas de distintos sensores y marcas desde
+              una plataforma centralizada, sin tener que revisar
+              cada equipo por separado.
+            </p>
+          </article>
+
+          <article class="benefit-card reveal">
+            <div class="benefit-icon orange-icon" aria-hidden="true">◷</div>
+
+            <h3>Historial para analizar tendencias</h3>
+
+            <p>
+              Revisa periodos de 12, 24 y 36 horas para identificar
+              variaciones, comprender comportamientos y apoyar
+              el diagnóstico técnico.
+            </p>
+          </article>
+
+          <article class="benefit-card reveal">
+            <div class="benefit-icon blue-icon" aria-hidden="true">⇩</div>
+
+            <h3>Reportes descargables</h3>
+
+            <p>
+              Exporta los registros a Excel para facilitar la revisión,
+              documentación y seguimiento de las condiciones
+              de tus equipos.
+            </p>
+          </article>
+
+          <article class="benefit-card reveal">
+            <div class="benefit-icon orange-icon" aria-hidden="true">⌘</div>
+
+            <h3>Información fácil de interpretar</h3>
+
+            <p>
+              Una interfaz sencilla, enfocada en los datos relevantes
+              para comprender las gráficas y agilizar las decisiones
+              del personal técnico.
+            </p>
+          </article>
+
+          <article class="benefit-card reveal">
+            <div class="benefit-icon blue-icon" aria-hidden="true">▤</div>
+
+            <h3>Accesos según cada usuario</h3>
+
+            <p>
+              Diferentes paneles para administración, soporte técnico
+              y vigilancia, de acuerdo con las necesidades
+              y responsabilidades de cada perfil.
+            </p>
+          </article>
+
+          <article class="benefit-card reveal">
+            <div class="benefit-icon orange-icon" aria-hidden="true">◎</div>
+
+            <h3>Soporte con mayor contexto</h3>
+
+            <p>
+              Utiliza los registros históricos como apoyo para investigar
+              incidencias, priorizar revisiones y planificar
+              el mantenimiento de los equipos.
+            </p>
+          </article>
+
+        </div>
+
+        <p class="section-note reveal">
+          MonitoreoV5 facilita el análisis y el seguimiento técnico.
+          La detección automática de anomalías y las alertas
+          se podrán incorporar como funcionalidades futuras.
+        </p>
+
+      </div>
+    </section>
+
+
+    <!-- FUNCIONALIDADES -->
+    <section class="section features-section" id="funcionalidades">
+      <div class="container">
+
+        <div class="features-grid">
+
+          <div class="features-content reveal">
+
+            <span class="eyebrow">UNA PLATAFORMA, DISTINTOS PERFILES</span>
+
+            <h2>
+              La información correcta
+              <span>para cada función.</span>
+            </h2>
+
+            <p>
+              Cada usuario necesita consultar información diferente.
+              MonitoreoV5 organiza el acceso mediante paneles diseñados
+              para las actividades de cada perfil.
+            </p>
+
+            <ul class="feature-list">
+
+              <li>
+                <span class="check-icon" aria-hidden="true">✓</span>
+                <div>
+                  <strong>Monitoreo centralizado</strong>
+                  <p>
+                    Consulta las temperaturas de distintos sensores
+                    y sucursales desde una misma plataforma.
+                  </p>
+                </div>
+              </li>
+
+              <li>
+                <span class="check-icon" aria-hidden="true">✓</span>
+                <div>
+                  <strong>Seguimiento histórico</strong>
+                  <p>
+                    Examina gráficas de 12, 24 y 36 horas y descarga
+                    los datos disponibles para analizarlos.
+                  </p>
+                </div>
+              </li>
+
+              <li>
+                <span class="check-icon" aria-hidden="true">✓</span>
+                <div>
+                  <strong>Información para el soporte</strong>
+                  <p>
+                    Utiliza los registros como referencia para
+                    diagnosticar incidencias y documentar revisiones.
+                  </p>
+                </div>
+              </li>
+
+              <li>
+                <span class="check-icon" aria-hidden="true">✓</span>
+                <div>
+                  <strong>Bitácora operativa</strong>
+                  <p>
+                    Facilita el seguimiento de las observaciones
+                    y actividades del personal de vigilancia.
+                  </p>
+                </div>
+              </li>
+
+            </ul>
+
+            <a class="btn btn-primary" href="#contacto">
+              Solicitar una demostración
+              <span aria-hidden="true">→</span>
+            </a>
+
+          </div>
+
+
+          <!-- TARJETA DE PERFILES -->
+          <div class="roles-panel reveal">
+
+            <div class="roles-heading">
+
+              <div class="roles-logo" aria-hidden="true">❄</div>
+
+              <div>
+                <strong>MonitoreoV5</strong>
+                <p>Paneles según el perfil de usuario</p>
+              </div>
+
+            </div>
+
+            <article class="role-card">
+
+              <div class="role-icon" aria-hidden="true">▦</div>
+
+              <div>
+                <strong>Administrador</strong>
+                <p>Supervisión general y gestión de accesos.</p>
+              </div>
+
+            </article>
+
+            <article class="role-card">
+
+              <div class="role-icon" aria-hidden="true">⚙</div>
+
+              <div>
+                <strong>Soporte técnico</strong>
+                <p>Consulta de gráficas e información para diagnóstico.</p>
+              </div>
+
+            </article>
+
+            <article class="role-card">
+
+              <div class="role-icon" aria-hidden="true">▤</div>
+
+              <div>
+                <strong>Vigilancia</strong>
+                <p>Vista sencilla para el seguimiento y la bitácora.</p>
+              </div>
+
+            </article>
+
+            <div class="roles-note">
+              <span class="check-icon" aria-hidden="true">✓</span>
+              <span>Información organizada según las necesidades del usuario.</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- CÓMO FUNCIONA -->
+    <section class="section" id="como-funciona">
+      <div class="container">
+
+        <div class="section-heading reveal">
+
+          <span class="eyebrow">SIMPLE Y FUNCIONAL</span>
+
+          <h2>
+            De los sensores
+            <span>a las decisiones.</span>
+          </h2>
+
+          <p>
+            Centraliza la información de temperatura y facilita
+            el seguimiento de tus equipos de refrigeración industrial.
+          </p>
+
+        </div>
+
+        <div class="process-grid">
+
+          <article class="process-card reveal">
+            <span>01</span>
+            <h3>Conecta</h3>
+            <p>
+              Integra los sensores compatibles de tus equipos
+              mediante la infraestructura de monitoreo.
+            </p>
+          </article>
+
+          <article class="process-card reveal">
+            <span>02</span>
+            <h3>Visualiza</h3>
+            <p>
+              Consulta las lecturas y sus gráficas en una interfaz
+              diseñada para facilitar la comprensión.
+            </p>
+          </article>
+
+          <article class="process-card reveal">
+            <span>03</span>
+            <h3>Analiza</h3>
+            <p>
+              Examina los registros históricos y busca variaciones
+              que requieran una revisión técnica.
+            </p>
+          </article>
+
+          <article class="process-card reveal">
+            <span>04</span>
+            <h3>Da seguimiento</h3>
+            <p>
+              Apoya las decisiones de mantenimiento y documenta
+              las acciones del equipo de soporte.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- PLANES -->
+    <section class="section plans-section" id="planes">
+      <div class="container">
+
+        <div class="section-heading reveal">
+
+          <span class="eyebrow">SOLUCIONES A TU MEDIDA</span>
+
+          <h2>
+            Monitoreo adaptado
+            <span>a tu operación.</span>
+          </h2>
+
+          <p>
+            Opciones de servicio según la cantidad de sucursales,
+            los sensores y las horas de cobertura que necesita tu negocio.
+            Solicita una propuesta personalizada.
+          </p>
+
+        </div>
+
+        <div class="plans-grid">
+
+          <article class="plan-card reveal">
+
+            <span class="plan-label">COBERTURA ESENCIAL</span>
+
+            <h3>Plan Básico</h3>
+
+            <p>
+              Para operaciones pequeñas, pocas sucursales
+              o necesidades específicas de monitoreo HVAC.
+            </p>
+
+            <ul>
+              <li>Monitoreo durante horas acordadas.</li>
+              <li>Consulta de gráficas históricas.</li>
+              <li>Descarga de datos disponibles.</li>
+              <li>Soporte según la cobertura contratada.</li>
+            </ul>
+
+            <a
+              class="btn btn-outline"
+              href="#contacto"
+              data-plan="Plan Básico"
+            >
+              Consultar este plan
+            </a>
+
+          </article>
+
+
+          <article class="plan-card plan-featured reveal">
+
+            <span class="plan-label">COBERTURA AMPLIADA</span>
+
+            <h3>Jornada Completa</h3>
+
+            <p>
+              Para negocios que requieren monitoreo y soporte
+              durante una jornada de ocho horas.
+            </p>
+
+            <ul>
+              <li>Monitoreo durante 8 horas acordadas.</li>
+              <li>Seguimiento de múltiples sensores.</li>
+              <li>Consulta y análisis de gráficas.</li>
+              <li>Soporte técnico durante la cobertura.</li>
+            </ul>
+
+            <a
+              class="btn btn-primary"
+              href="#contacto"
+              data-plan="Jornada Completa"
+            >
+              Solicitar propuesta
+            </a>
+
+          </article>
+
+
+          <article class="plan-card reveal">
+
+            <span class="plan-label">COBERTURA CONTINUA</span>
+
+            <h3>Monitoreo 24/7</h3>
+
+            <p>
+              Para operaciones con mayor número de sucursales,
+              sensores y necesidades de seguimiento continuo.
+            </p>
+
+            <ul>
+              <li>Monitoreo con cobertura de 24 horas.</li>
+              <li>Seguimiento de múltiples sucursales.</li>
+              <li>Historial de temperaturas disponible.</li>
+              <li>Esquema de soporte según propuesta.</li>
+            </ul>
+
+            <a
+              class="btn btn-outline"
+              href="#contacto"
+              data-plan="Monitoreo 24/7"
+            >
+              Cotizar cobertura
+            </a>
+
+          </article>
+
+        </div>
+
+        <p class="section-note reveal">
+          Los precios, límites de sensores, cobertura de soporte
+          y condiciones del servicio se definen mediante una propuesta
+          comercial personalizada. El monitoreo 24/7 no implica
+          disponibilidad de alertas automáticas.
+        </p>
+
+      </div>
+    </section>
+
+    
+    <!-- CONTACTO Y FORMULARIO DE PROSPECTOS -->
+    <section class="section contact-section" id="contacto">
+      <div class="container">
+
+        <div class="contact-grid">
+
+          <div class="contact-content reveal">
+
+            <span class="eyebrow">HABLEMOS DE TU OPERACIÓN</span>
+
+            <h2>
+              Tu próximo paso hacia un
+              <span>monitoreo más inteligente.</span>
+            </h2>
+
+            <p>
+              Cuéntanos un poco sobre tu empresa y tus necesidades.
+              Podemos ayudarte a identificar una opción de monitoreo
+              y soporte adecuada para tus equipos de refrigeración.
+            </p>
+
+            <div class="contact-points">
+
+              <p>
+                <span aria-hidden="true">✓</span>
+                Monitoreo de múltiples sensores y sucursales.
+              </p>
+
+              <p>
+                <span aria-hidden="true">✓</span>
+                Gráficas históricas y descarga de registros.
+              </p>
+
+              <p>
+                <span aria-hidden="true">✓</span>
+                Opciones de cobertura según tu operación.
+              </p>
+
+              <p>
+                <span aria-hidden="true">✓</span>
+                Atención orientada al soporte técnico.
+              </p>
+
+            </div>
+
+            <a
+              class="whatsapp-link"
+              href="#contacto"
+              data-whatsapp
+              aria-label="Contactar a MonitoreoV5 por WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L3 20l1.2-4.8A8.2 8.2 0 1 1 20.2 11.7Z"/>
+                <path d="M8.2 7.9c.3-.5.6-.5.9-.5h.4c.2 0 .4.1.5.4l.8 1.8c.1.2.1.4-.1.6l-.6.8c-.2.2-.2.4 0 .7.5.9 1.3 1.7 2.2 2.2.3.2.5.2.7-.1l.9-1.1c.2-.2.4-.3.7-.2l1.7.8c.3.1.4.3.4.5 0 .3-.1 1.2-.8 1.8-.6.6-1.4.8-2.3.6-1.1-.2-2.4-.8-3.7-1.9-1.1-.9-2-2.2-2.4-3.2-.4-1.1-.1-2.2.7-3.2Z"/>
+              </svg>
+
+              Contactar por WhatsApp
+            </a>
+
+            <p class="contact-note" id="whatsappNote">
+              El contacto por WhatsApp estará disponible cuando
+              se configure el número comercial.
+            </p>
+
+          </div>
+
+
+          <!-- FORMULARIO -->
+          <form class="lead-form reveal" id="leadForm">
+
+            <div class="form-heading">
+              <span class="eyebrow">SOLICITA INFORMACIÓN</span>
+
+              <h3>Conozcamos tu proyecto</h3>
+
+              <p>
+                Completa tus datos básicos para solicitar
+                información o una demostración.
+              </p>
+            </div>
+
+
+            <div class="form-field">
+              <label for="name">Nombre completo *</label>
+
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="¿Cómo te llamas?"
+                autocomplete="name"
+                maxlength="100"
+                required
+              >
+            </div>
+
+
+            <div class="form-field">
+              <label for="company">Empresa *</label>
+
+              <input
+                type="text"
+                id="company"
+                name="company"
+                placeholder="Nombre de tu empresa"
+                autocomplete="organization"
+                maxlength="120"
+                required
+              >
+            </div>
+
+
+            <div class="form-field">
+              <label for="email">Correo electrónico *</label>
+
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="nombre@empresa.com"
+                autocomplete="email"
+                maxlength="150"
+                required
+              >
+            </div>
+
+
+            <div class="form-field">
+              <label for="phone">Teléfono de contacto</label>
+
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="Tu teléfono con código de país"
+                autocomplete="tel"
+                maxlength="25"
+              >
+            </div>
+
+
+            <div class="form-field">
+              <label for="branches">¿Cuántas sucursales necesitas monitorear?</label>
+
+              <select id="branches" name="branches">
+                <option value="No especificado">Selecciona una opción</option>
+                <option value="1 sucursal">1 sucursal</option>
+                <option value="2 a 5 sucursales">2 a 5 sucursales</option>
+                <option value="6 a 20 sucursales">6 a 20 sucursales</option>
+                <option value="21 a 50 sucursales">21 a 50 sucursales</option>
+                <option value="Más de 50 sucursales">Más de 50 sucursales</option>
+              </select>
+            </div>
+
+
+            <div class="consent">
+              <input
+                type="checkbox"
+                id="privacyConsent"
+                name="privacyConsent"
+                required
+              >
+
+              <label for="privacyConsent">
+                Acepto que MonitoreoV5 utilice mis datos para
+                contactarme en relación con mi solicitud.
+              </label>
+            </div>
+
+
+            <button class="btn btn-primary btn-full" type="submit">
+              Solicitar información
+              <span aria-hidden="true">→</span>
+            </button>
+
+            <p
+              class="form-message"
+              id="formMessage"
+              role="status"
+              aria-live="polite"
+            ></p>
+
+            <p class="form-disclaimer">
+              Tus datos no se enviarán a un servidor desde esta versión.
+              El envío comercial se habilitará al configurar el contacto.
+            </p>
+
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="footer">
+
+    <div class="container">
+
+      <div class="footer-main">
+
+        <a class="brand footer-brand" href="#inicio">
+
+          <span class="brand-logo" aria-hidden="true">
+            ❄
+          </span>
+
+          <span class="brand-text">
+            <strong>MonitoreoV5</strong>
+            <small>CONTROL INTELIGENTE</small>
+          </span>
+
+        </a>
+
+        <p>
+          Monitoreo de temperatura y herramientas para facilitar
+          el seguimiento técnico de equipos de refrigeración industrial.
+        </p>
+
+        <a class="footer-login" href="/login5.html">
+          <span aria-hidden="true">↗</span>
+          Iniciar sesión
+        </a>
+
+      </div>
+
+
+      <div class="footer-bottom">
+
+        <span>
+          © <span id="currentYear">2026</span> MonitoreoV5.
+          Todos los derechos reservados.
+        </span>
+
+        <a href="#contacto">Solicitar información</a>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <!-- BOTÓN FLOTANTE DE WHATSAPP -->
+  <a
+    class="whatsapp-float"
+    href="#contacto"
+    data-whatsapp
+    aria-label="Contactar a MonitoreoV5 por WhatsApp"
+    title="Contactar por WhatsApp"
+  >
+
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L3 20l1.2-4.8A8.2 8.2 0 1 1 20.2 11.7Z"/>
+      <path d="M8.2 7.9c.3-.5.6-.5.9-.5h.4c.2 0 .4.1.5.4l.8 1.8c.1.2.1.4-.1.6l-.6.8c-.2.2-.2.4 0 .7.5.9 1.3 1.7 2.2 2.2.3.2.5.2.7-.1l.9-1.1c.2-.2.4-.3.7-.2l1.7.8c.3.1.4.3.4.5 0 .3-.1 1.2-.8 1.8-.6.6-1.4.8-2.3.6-1.1-.2-2.4-.8-3.7-1.9-1.1-.9-2-2.2-2.4-3.2-.4-1.1-.1-2.2.7-3.2Z"/>
+    </svg>
+
+  </a>
+
+</body>
+</html>
