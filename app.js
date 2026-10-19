@@ -316,6 +316,303 @@ if (currentTemperature) {
 */
 
 
+/* =========================================
+   MonitoreoV5
+   JavaScript nativo
+   Parte 2 de 2
+   ========================================= */
+
+
+/* =========================================
+   6. ANIMACIONES DE APARICIÓN
+   ========================================= */
+
+// Activamos las animaciones únicamente si JavaScript funciona.
+document.documentElement.classList.add("js");
+
+const revealElements = document.querySelectorAll(".reveal");
+
+const prefersReducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
+
+if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+  // Mostramos el contenido sin animación si es necesario.
+  revealElements.forEach((element) => {
+    element.classList.add("visible");
+  });
+} else {
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.12,
+      rootMargin: "0px 0px -35px 0px"
+    }
+  );
+
+  revealElements.forEach((element) => {
+    revealObserver.observe(element);
+  });
+}
+
+
+/* =========================================
+   7. AÑO AUTOMÁTICO DEL PIE DE PÁGINA
+   ========================================= */
+
+const currentYear = document.querySelector("#currentYear");
+
+if (currentYear) {
+  currentYear.textContent = new Date().getFullYear();
+}
+
+
+/* =========================================
+   8. SELECCIÓN DE PLANES
+   Prepara el formulario para identificar
+   el plan que interesa al visitante.
+   ========================================= */
+
+const planButtons = document.querySelectorAll("[data-plan]");
+const leadForm = document.querySelector("#leadForm");
+const formHeading = document.querySelector(".form-heading h3");
+
+let selectedPlan = "";
+
+function selectPlan(plan) {
+  if (typeof plan !== "string" || !plan.trim()) return;
+
+  selectedPlan = plan.trim();
+
+  // Actualizamos el encabezado del formulario.
+  if (formHeading) {
+    formHeading.textContent = "Solicitud: " + selectedPlan;
+  }
+
+  // Guardamos el plan en un campo oculto del formulario.
+  // Se crea con JavaScript para no tener que modificar el HTML.
+  if (leadForm) {
+    let planInput = leadForm.querySelector(
+      'input[name="selectedPlan"]'
+    );
+
+    if (!planInput) {
+      planInput = document.createElement("input");
+      planInput.type = "hidden";
+      planInput.name = "selectedPlan";
+      leadForm.appendChild(planInput);
+    }
+
+    planInput.value = selectedPlan;
+  }
+}
+
+planButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const plan = button.dataset.plan;
+
+    if (plan) {
+      selectPlan(plan);
+    }
+  });
+});
+
+
+/* =========================================
+   9. WHATSAPP COMERCIAL
+   Sustituye el valor vacío por tu número.
+   Formato internacional: solo dígitos,
+   sin +, espacios, guiones ni paréntesis.
+   Ejemplo ficticio: 521234567890
+   ========================================= */
+
+const WHATSAPP_NUMBER = "";
+
+const whatsappLinks = document.querySelectorAll("[data-whatsapp]");
+const whatsappNote = document.querySelector("#whatsappNote");
+
+function buildWhatsAppMessage() {
+  const lines = [
+    "Hola, me interesa conocer MonitoreoV5.",
+    "",
+    "Quisiera recibir información sobre el monitoreo de temperatura",
+    "de equipos de refrigeración industrial."
+  ];
+
+  if (selectedPlan) {
+    lines.push("", "Plan de interés: " + selectedPlan);
+  }
+
+  return lines.join("\n");
+}
+
+function configureWhatsApp() {
+  const validNumber = /^\d{8,15}$/.test(WHATSAPP_NUMBER);
+
+  whatsappLinks.forEach((link) => {
+    if (validNumber) {
+      const message = encodeURIComponent(buildWhatsAppMessage());
+
+      link.href =
+        "https://wa.me/" + WHATSAPP_NUMBER +
+        "?text=" + message;
+
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.removeAttribute("aria-disabled");
+      link.removeAttribute("title");
+    } else {
+      link.href = "#contacto";
+      link.removeAttribute("target");
+      link.removeAttribute("rel");
+      link.setAttribute("aria-disabled", "true");
+      link.title = "WhatsApp todavía no está configurado";
+    }
+  });
+
+  if (whatsappNote) {
+    if (validNumber) {
+      whatsappNote.hidden = true;
+    } else {
+      whatsappNote.hidden = false;
+      whatsappNote.textContent =
+        "El contacto por WhatsApp estará disponible cuando " +
+        "se configure el número comercial.";
+    }
+  }
+}
+
+// Evitamos que los enlaces sin número configurado
+// aparenten abrir una conversación.
+whatsappLinks.forEach((link) => {
+  link.addEventListener("click", (event) => {
+    if (!/^\d{8,15}$/.test(WHATSAPP_NUMBER)) {
+      event.preventDefault();
+
+      if (whatsappNote) {
+        whatsappNote.hidden = false;
+        whatsappNote.textContent =
+          "WhatsApp aún no está configurado. " +
+          "Puedes solicitar información mediante el formulario.";
+      }
+    }
+  });
+});
+
+configureWhatsApp();
+
+
+/* =========================================
+   10. FORMULARIO DE CONTACTO
+   Esta versión NO envía datos a un servidor.
+   ========================================= */
+
+const formMessage = document.querySelector("#formMessage");
+
+if (leadForm) {
+  leadForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (formMessage) {
+      formMessage.textContent = "";
+    }
+
+    // Validación nativa del navegador.
+    if (!leadForm.checkValidity()) {
+      leadForm.reportValidity();
+      return;
+    }
+
+    const formData = new FormData(leadForm);
+
+    const name = String(formData.get("name") || "").trim();
+    const company = String(formData.get("company") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+    const phone = String(formData.get("phone") || "").trim();
+    const branches = String(
+      formData.get("branches") || "No especificado"
+    );
+    const plan = String(
+      formData.get("selectedPlan") || selectedPlan || "No especificado"
+    );
+
+    // Comprobaciones adicionales.
+    if (!name || !company || !email) {
+      if (formMessage) {
+        formMessage.textContent =
+          "Completa tu nombre, empresa y correo electrónico.";
+      }
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      if (formMessage) {
+        formMessage.textContent =
+          "Introduce un correo electrónico válido.";
+      }
+      return;
+    }
+
+    const consent = document.querySelector("#privacyConsent");
+
+    if (!consent || !consent.checked) {
+      if (formMessage) {
+        formMessage.textContent =
+          "Debes aceptar el consentimiento para continuar.";
+      }
+      return;
+    }
+
+    // En esta versión solo confirmamos la validación.
+    // No guardamos ni transmitimos los datos.
+    if (formMessage) {
+      formMessage.textContent =
+        "¡Gracias, " + name + "! Tus datos se validaron correctamente, " +
+        "pero todavía no se han enviado. " +
+        "El formulario necesita conectarse a un servicio para que " +
+        "MonitoreoV5 reciba tu solicitud.";
+    }
+
+    console.info("Formulario validado localmente.", {
+      name,
+      company,
+      email,
+      phone,
+      branches,
+      plan
+    });
+  });
+}
+
+
+/* =========================================
+   11. ACTUALIZACIÓN DEL MENSAJE DE WHATSAPP
+   Si el visitante selecciona un plan,
+   actualizamos el enlace con ese plan.
+   ========================================= */
+
+planButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (selectedPlan) {
+      configureWhatsApp();
+    }
+  });
+});
+
+
+/* =========================================
+   FIN DE MONITOREOV5 - APP.JS
+   ========================================= */
+
 
 
 
