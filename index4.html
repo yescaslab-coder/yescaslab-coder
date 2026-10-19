@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MonitoreoV5 | Control de temperatura industrial</title>
+  <meta
+    name="description"
+    content="Centraliza lecturas de temperatura, revisa históricos y descarga reportes para mantener tu operación bajo control."
+  />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#123B8B" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MonitoreoV5 | Control de temperatura industrial" />
+  <meta
+    property="og:description"
+    content="Consulta temperaturas, organiza sensores y revisa gráficas históricas desde una sola plataforma."
+  />
+  <meta property="og:locale" content="es_MX" />
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+
+  <style>
+    :root {
+      --mv-primary: #123b8b;
+      --mv-primary-dark: #0b2458;
+      --mv-primary-light: #eaf0fc;
+      --mv-primary-soft: #f3f7ff;
+      --mv-accent: #f28c28;
+      --mv-accent-soft: #fff4e8;
+      --mv-bg: #f7f9fc;
+      --mv-white: #ffffff;
+      --mv-text: #243247;
+      --mv-muted: #68778d;
+      --mv-border: #e2e8f0;
+      --mv-success: #16845b;
+      --mv-radius: 20px;
+      --mv-shadow: 0 18px 50px rgba(11, 36, 88, 0.10);
+      --mv-shadow-soft: 0 10px 28px rgba(18, 59, 139, 0.08);
+      --mv-transition: 180ms ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--mv-white);
+      color: var(--mv-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    img, svg {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: var(--mv-primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--mv-primary-dark);
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(242, 140, 40, 0.8);
+      outline-offset: 3px;
+    }
+
+    .mv-container {
+      width: min(1160px, calc(100% - 40px));
+      margin-inline: auto;
+    }
+
+    .mv-section {
+      padding: 90px 0;
+    }
+
+    .mv-section-soft {
+      background: var(--mv-bg);
+    }
+
+    .mv-section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      color: var(--mv-primary);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .mv-section-label::before {
+      width: 26px;
+      height: 3px;
+      border-radius: 99px;
+      background: var(--mv-accent);
+      content: "";
+    }
+
+    .mv-heading {
+      max-width: 760px;
+      margin-bottom: 18px;
+      color: var(--mv-primary-dark);
+      font-size: clamp(2.1rem, 4vw, 3.2rem);
+      font-weight: 850;
+      letter-spacing: -0.06em;
+      line-height: 1.12;
+    }
+
+    .mv-subheading {
+      max-width: 700px;
+      margin-bottom: 0;
+      color: var(--mv-muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    .mv-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 52px;
+      padding: 13px 24px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 750;
+      line-height: 1.4;
+      text-align: center;
+      transition: all var(--mv-transition);
+      white-space: nowrap;
+    }
+
+    .mv-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .mv-btn-primary {
+      background: var(--mv-primary);
+      color: var(--mv-white);
+      box-shadow: 0 12px 24px rgba(18, 59, 139, 0.18);
+    }
+
+    .mv-btn-primary:hover {
+      background: var(--mv-primary-dark);
+      color: var(--mv-white);
+    }
+
+    .mv-btn-accent {
+      background: var(--mv-accent);
+      color: #17243a;
+      box-shadow: 0 12px 24px rgba(242, 140, 40, 0.22);
+    }
+
+    .mv-btn-accent:hover {
+      background: #ff9d3f;
+      color: #17243a;
+    }
+
+    .mv-btn-outline {
+      border-color: #cbd7ee;
+      background: var(--mv-white);
+      color: var(--mv-primary);
+    }
+
+    .mv-btn-outline:hover {
+      border-color: var(--mv-primary);
+      background: var(--mv-primary-light);
+      color: var(--mv-primary-dark);
+    }
+
+    .mv-icon {
+      display: inline-flex;
+      width: 52px;
+      height: 52px;
+      flex: 0 0 52px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 15px;
+      background: var(--mv-primary-light);
+      color: var(--mv-primary);
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .mv-card {
+      height: 100%;
+      padding: 28px;
+      border: 1px solid var(--mv-border);
+      border-radius: var(--mv-radius);
+      background: var(--mv-white);
+      box-shadow: var(--mv-shadow-soft);
+      transition:
+        transform var(--mv-transition),
+        box-shadow var(--mv-transition),
+        border-color var(--mv-transition);
+    }
+
+    .mv-card:hover {
+      transform: translateY(-4px);
+      border-color: #cbd7ed;
+      box-shadow: var(--mv-shadow);
+    }
+
+    .mv-card h3 {
+      margin: 18px 0 12px;
+      color: var(--mv-primary-dark);
+      font-size: 1.14rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .mv-card p {
+      margin-bottom: 0;
+      color: var(--mv-muted);
+      font-size: 0.96rem;
+      line-height: 1.8;
+    }
+
+    .mv-header {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .mv-navbar {
+      min-height: 78px;
+    }
+
+    .mv-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--mv-primary-dark);
+      font-size: 1.32rem;
+      font-weight: 850;
+      letter-spacing: -0.05em;
+    }
+
+    .mv-brand:hover {
+      color: var(--mv-primary);
+    }
+
+    .mv-brand-symbol {
+      display: inline-flex;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 13px;
+      background: var(--mv-primary);
+      color: var(--mv-white);
+      box-shadow: 0 10px 20px rgba(18, 59, 139, 0.20);
+    }
+
+    .mv-brand-symbol svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .mv-brand-v {
+      color: var(--mv-accent);
+    }
+
+    .mv-nav-links {
+      align-items: center;
+      gap: 4px;
+    }
+
+    .mv-nav-links .nav-link {
+      padding: 10px 12px;
+      border-radius: 9px;
+      color: #4d5b70;
+      font-size: 0.88rem;
+      font-weight: 700;
+      transition: background var(--mv-transition), color var(--mv-transition);
+    }
+
+    .mv-nav-links .nav-link:hover {
+      background: var(--mv-primary-light);
+      color: var(--mv-primary);
+    }
+
+    .mv-nav-system {
+      margin-left: 5px;
+      border: 1px solid var(--mv-border);
+      border-radius: 10px;
+      color: var(--mv-primary) !important;
+      background: #fff;
+    }
+
+    .mv-navbar .navbar-toggler {
+      padding: 9px 11px;
+      border-color: var(--mv-border);
+      border-radius: 10px;
+    }
+
+    .mv-navbar .navbar-toggler:focus {
+      box-shadow: 0 0 0 3px rgba(242, 140, 40, 0.2);
+    }
+
+    .mv-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 78px 0 84px;
+      background:
+        radial-gradient(ellipse at 80% 18%, rgba(217, 229, 255, 0.8) 0%, rgba(217, 229, 255, 0) 40%),
+        linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+    }
+
+    .mv-hero::before {
+      position: absolute;
+      top: 68px;
+      right: -140px;
+      width: 360px;
+      height: 360px;
+      border: 1px solid rgba(18, 59, 139, 0.08);
+      border-radius: 50%;
+      content: "";
+      pointer-events: none;
+    }
+
+    .mv-hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .mv-hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 24px;
+      padding: 9px 14px;
+      border: 1px solid #d8e3f7;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--mv-primary);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .mv-hero-eyebrow-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--mv-accent);
+      box-shadow: 0 0 0 5px rgba(242, 140, 40, 0.12);
+    }
+
+    .mv-hero h1 {
+      max-width: 690px;
+      margin: 0 0 22px;
+      color: var(--mv-primary-dark);
+      font-size: clamp(2.6rem, 5vw, 4.25rem);
+      font-weight: 850;
+      letter-spacing: -0.065em;
+      line-height: 1.08;
+    }
+
+    .mv-hero h1 .mv-highlight {
+      color: var(--mv-primary);
+      text-decoration: underline;
+      text-decoration-color: var(--mv-accent);
+      text-decoration-thickness: 4px;
+      text-underline-offset: 7px;
+    }
+
+    .mv-hero-description {
+      max-width: 590px;
+      margin-bottom: 30px;
+      color: #5e6c81;
+      font-size: 1.08rem;
+      line-height: 1.85;
+    }
+
+    .mv-hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .mv-hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mv-hero-points li {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #526176;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .mv-check {
+      display: inline-flex;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #e2f4eb;
+      color: var(--mv-success);
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .mv-dashboard-wrap {
+      position: relative;
+      z-index: 1;
+      padding: 14px;
+      border: 1px solid rgba(190, 204, 229, 0.85);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 28px 75px rgba(11, 36, 88, 0.14);
+    }
+
+    .mv-dashboard {
+      overflow: hidden;
+      border: 1px solid #e5eaf2;
+      border-radius: 15px;
+      background: #ffffff;
+    }
+
+    .mv-dashboard-topbar {
+      display: flex;
+      min-height: 63px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 18px;
+      border-bottom: 1px solid #e9edf4;
+    }
+
+    .mv-dashboard-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--mv-primary-dark);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .mv-dashboard-mini-logo {
+      display: flex;
+      width: 30px;
+      height: 30px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      background: var(--mv-primary);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .mv-demo-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 9px;
+      border: 1px solid #f3d7b9;
+      border-radius: 7px;
+      background: #fff6ec;
+      color: #8c4a0a;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .mv-dashboard-body {
+      padding: 20px;
+      background: #fafbfd;
+    }
+
+    .mv-dashboard-heading {
+      margin-bottom: 3px;
+      color: #1a2c4d;
+      font-size: 1.02rem;
+      font-weight: 800;
+    }
+
+    .mv-dashboard-caption {
+      margin-bottom: 17px;
+      color: #7b8799;
+      font-size: 0.76rem;
+    }
+
+    .mv-dashboard-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 11px;
+      margin-bottom: 15px;
+    }
+
+    .mv-metric {
+      min-width: 0;
+      padding: 13px;
+      border: 1px solid #e5eaf2;
+      border-radius: 11px;
+      background: #ffffff;
+    }
+
+    .mv-metric-label {
+      display: block;
+      margin-bottom: 6px;
+      color: #758196;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .mv-metric-value {
+      display: block;
+      color: var(--mv-primary-dark);
+      font-size: clamp(1.25rem, 2vw, 1.8rem);
+      font-weight: 850;
+      letter-spacing: -0.04em;
+      line-height: 1.2;
+    }
+
+    .mv-metric-detail {
+      display: block;
+      margin-top: 5px;
+      color: #7b8799;
+      font-size: 0.66rem;
+    }
+
+    .mv-dashboard-chart-card {
+      margin-bottom: 13px;
+      padding: 15px 13px 9px;
+      border: 1px solid #e5eaf2;
+      border-radius: 11px;
+      background: #ffffff;
+    }
+
+    .mv-chart-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .mv-chart-title {
+      color: #263956;
+      font-size: 0.77rem;
+      font-weight: 800;
+    }
+
+    .mv-chart-period {
+      padding: 4px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      color: #66758a;
+      font-size: 0.65rem;
+      background: #f8fafc;
+    }
+
+    .mv-chart {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .mv-chart-label {
+      fill: #8793a6;
+      font-size: 10px;
+      font-family: Arial, sans-serif;
+    }
+
+    .mv-dashboard-table {
+      overflow: hidden;
+      border: 1px solid #e5eaf2;
+      border-radius: 10px;
+      background: #ffffff;
+    }
+
+    .mv-dashboard-table-heading {
+      padding: 11px 13px;
+      border-bottom: 1px solid #e9edf4;
+      color: #263956;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .mv-sensor-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border-bottom: 1px solid #eef1f6;
+    }
+
+    .mv-sensor-row:last-child {
+      border-bottom: 0;
+    }
+
+    .mv-sensor-name {
+      display: block;
+      color: #35465f;
+      font-size: 0.72rem;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .mv-sensor-location {
+      display: block;
+      margin-top: 2px;
+      color: #8793a6;
+      font-size: 0.65rem;
+    }
+
+    .mv-sensor-reading {
+      color: var(--mv-primary-dark);
+      font-size: 0.88rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .mv-dashboard-disclaimer {
+      margin: 12px 0 0;
+      color: #77849a;
+      font-size: 0.68rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .mv-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .mv-stat {
+      padding: 24px 18px;
+      border: 1px solid var(--mv-border);
+      border-radius: 18px;
+      background: var(--mv-white);
+      box-shadow: var(--mv-shadow-soft);
+    }
+
+    .mv-stat strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--mv-primary-dark);
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 850;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .mv-stat span {
+      color: var(--mv-muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .accordion {
+      --bs-accordion-border-width: 0;
+    }
+
+    .accordion-item {
+      border: 1px solid var(--mv-border);
+      border-radius: 16px !important;
+      background: var(--mv-white);
+      box-shadow: var(--mv-shadow-soft);
+      overflow: hidden;
+    }
+
+    .accordion-button {
+      padding: 22px 24px;
+      background: var(--mv-white);
+      color: var(--mv-primary-dark);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .accordion-button:not(.collapsed) {
+      background: var(--mv-primary-soft);
+      color: var(--mv-primary-dark);
+      box-shadow: none;
+    }
+
+    .accordion-button:focus {
+      box-shadow: none;
+      border-color: transparent;
+    }
+
+    .accordion-body {
+      padding: 0 24px 22px;
+      color: var(--mv-muted);
+      font-size: 0.96rem;
+      line-height: 1.8;
+    }
+
+    .mv-cta-card {
+      padding: 38px 32px;
+      border: 1px solid transparent;
+      border-radius: 26px;
+      background: linear-gradient(135deg, var(--mv-primary) 0%, var(--mv-primary-dark) 100%);
+      box-shadow: 0 22px 52px rgba(11, 36, 88, 0.18);
+    }
+
+    .mv-cta-card .mv-section-label {
+      color: #eaf0fc;
+    }
+
+    .mv-cta-card .mv-heading {
+      max-width: 680px;
+      margin-bottom: 0;
+      color: #ffffff;
+    }
+
+    footer {
+      padding: 22px 0 46px;
+    }
+
+    @media (max-width: 991.98px) {
+      .mv-hero {
+        padding-top: 62px;
+      }
+
+      .mv-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .mv-section {
+        padding: 72px 0;
+      }
+
+      .mv-hero-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .mv-hero-cta,
+      .mv-hero-secondary {
+        width: 100%;
+      }
+
+      .mv-stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .mv-container {
+        width: min(100% - 24px, 1160px);
+      }
+
+      .mv-dashboard-wrap {
+        padding: 8px;
+        border-radius: 16px;
+      }
+
+      .mv-dashboard-topbar {
+        padding: 11px;
+      }
+
+      .mv-dashboard-body {
+        padding: 12px;
+      }
+
+      .mv-dashboard-metrics {
+        gap: 8px;
+      }
+
+      .mv-metric {
+        padding: 10px;
+      }
+
+      .mv-dashboard-chart-card {
+        padding: 11px 8px 6px;
+      }
+
+      .mv-cta-card {
+        padding: 26px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="mv-header">
+    <nav class="navbar navbar-expand-lg mv-navbar" aria-label="Navegación principal">
+      <div class="container mv-container">
+        <a class="mv-brand" href="#inicio" aria-label="MonitoreoV5, ir al inicio">
+          <span class="mv-brand-symbol" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M16 4V28M5.6 10L26.4 22M5.6 22L26.4 10"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              />
+              <circle cx="16" cy="16" r="4.1" fill="#F28C28" />
+              <circle cx="16" cy="4" r="2" fill="currentColor" />
+              <circle cx="16" cy="28" r="2" fill="currentColor" />
+              <circle cx="5.6" cy="10" r="2" fill="currentColor" />
+              <circle cx="26.4" cy="22" r="2" fill="currentColor" />
+              <circle cx="5.6" cy="22" r="2" fill="currentColor" />
+              <circle cx="26.4" cy="10" r="2" fill="currentColor" />
+            </svg>
+          </span>
+          <span>Monitoreo<span class="mv-brand-v">V5</span></span>
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mvNavbar"
+          aria-controls="mvNavbar"
+          aria-expanded="false"
+          aria-label="Abrir o cerrar menú"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mvNavbar">
+          <ul class="navbar-nav ms-auto mv-nav-links">
+            <li class="nav-item"><a class="nav-link" href="#beneficios">Beneficios</a></li>
+            <li class="nav-item"><a class="nav-link" href="#funcionalidades">Funcionalidades</a></li>
+            <li class="nav-item"><a class="nav-link" href="#como-funciona">Cómo funciona</a></li>
+            <li class="nav-item"><a class="nav-link" href="#planes">Cobertura</a></li>
+            <li class="nav-item"><a class="nav-link" href="#preguntas">Preguntas</a></li>
+            <li class="nav-item">
+              <a
+                class="nav-link mv-nav-system"
+                href=""
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Acceso al sistema ↗
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="mv-hero" id="inicio" aria-labelledby="mv-hero-title">
+      <div class="container mv-container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6 mv-hero-content">
+            <div class="mv-hero-eyebrow">
+              <span class="mv-hero-eyebrow-dot" aria-hidden="true"></span>
+              Monitoreo de temperatura para tu operación
+            </div>
+
+            <h1 id="mv-hero-title">
+              Tus temperaturas, tus registros y tu operación
+              <span class="mv-highlight">más visibles.</span>
+            </h1>
+
+            <p class="mv-hero-description">
+              Centraliza la consulta de temperaturas de tus equipos de refrigeración,
+              revisa gráficas históricas y descarga registros para dar seguimiento técnico
+              a tu operación con MonitoreoV5.
+            </p>
+
+            <div class="mv-hero-actions">
+              <a class="mv-btn mv-btn-primary mv-hero-cta" href="#solicitar-demo">
+                Solicitar una demostración <span aria-hidden="true">→</span>
+              </a>
+              <a class="mv-btn mv-btn-outline mv-hero-secondary" href="#funcionalidades">
+                Conocer la plataforma
+              </a>
+            </div>
+
+            <ul class="mv-hero-points" aria-label="Características principales">
+              <li><span class="mv-check" aria-hidden="true">✓</span> Historiales consultables</li>
+              <li><span class="mv-check" aria-hidden="true">✓</span> Registros descargables</li>
+              <li><span class="mv-check" aria-hidden="true">✓</span> Organización por sensores</li>
+            </ul>
+          </div>
+
+          <div class="col-lg-6 mv-hero-content">
+            <div class="mv-dashboard-wrap">
+              <div class="mv-dashboard">
+                <div class="mv-dashboard-topbar">
+                  <div class="mv-dashboard-brand">
+                    <span class="mv-dashboard-mini-logo" aria-hidden="true">V5</span>
+                    <span>Panel de monitoreo</span>
+                  </div>
+                  <span class="mv-demo-badge">DEMOSTRACIÓN</span>
+                </div>
+
+                <div class="mv-dashboard-body">
+                  <h2 class="mv-dashboard-heading">Resumen de temperaturas</h2>
+                  <p class="mv-dashboard-caption">Vista ilustrativa · Datos ficticios</p>
+
+                  <div class="mv-dashboard-metrics">
+                    <div class="mv-metric">
+                      <span class="mv-metric-label">Lectura de ejemplo</span>
+                      <span class="mv-metric-value">-18.4 °C</span>
+                      <span class="mv-metric-detail">Sensor ilustrativo A</span>
+                    </div>
+
+                    <div class="mv-metric">
+                      <span class="mv-metric-label">Periodo de consulta</span>
+                      <span class="mv-metric-value">24 h</span>
+                      <span class="mv-metric-detail">Intervalo de ejemplo</span>
+                    </div>
+                  </div>
+
+                  <div class="mv-dashboard-chart-card">
+                    <div class="mv-chart-header">
+                      <span class="mv-chart-title">Historial de temperatura</span>
+                      <span class="mv-chart-period">Últimas 24 horas</span>
+                    </div>
+
+                    <svg
+                      class="mv-chart"
+                      viewBox="0 0 420 190"
+                      role="img"
+                      aria-labelledby="mv-chart-title mv-chart-description"
+                    >
+                      <title id="mv-chart-title">
+                        Ejemplo ilustrativo de una gráfica histórica de temperatura
+                      </title>
+                      <desc id="mv-chart-description">
+                        Línea ficticia de temperatura durante 24 horas.
+                        No representa mediciones reales.
+                      </desc>
+
+                      <defs>
+                        <linearGradient id="mv-chart-fill" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="#477BE0" stop-opacity="0.19" />
+                          <stop offset="100%" stop-color="#477BE0" stop-opacity="0.01" />
+                        </linearGradient>
+                      </defs>
+
+                      <g stroke="#E9EEF6" stroke-width="1">
+                        <line x1="42" y1="20" x2="405" y2="20" />
+                        <line x1="42" y1="55" x2="405" y2="55" />
+                        <line x1="42" y1="90" x2="405" y2="90" />
+                        <line x1="42" y1="125" x2="405" y2="125" />
+                        <line x1="42" y1="160" x2="405" y2="160" />
+                      </g>
+
+                      <g class="mv-chart-label" text-anchor="end">
+                        <text x="34" y="24">-16°</text>
+                        <text x="34" y="59">-17°</text>
+                        <text x="34" y="94">-18°</text>
+                        <text x="34" y="129">-19°</text>
+                        <text x="34" y="164">-20°</text>
+                      </g>
+
+                      <path
+                        d="M42 96 L72 103 L102 90 L132 110 L162 96 L192 83 L222 90 L252 73 L282 86 L312 66 L342 80 L372 69 L405 76 L405 160 L42 160 Z"
+                        fill="url(#mv-chart-fill)"
+                      />
+
+                      <path
+                        d="M42 96 L72 103 L102 90 L132 110 L162 96 L192 83 L222 90 L252 73 L282 86 L312 66 L342 80 L372 69 L405 76"
+                        fill="none"
+                        stroke="#2F65C5"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+
+                      <circle cx="252" cy="73" r="4.5" fill="#FFFFFF" stroke="#2F65C5" stroke-width="2.5" />
+                      <circle cx="405" cy="76" r="4.5" fill="#F28C28" stroke="#FFFFFF" stroke-width="2" />
+
+                      <g class="mv-chart-label" text-anchor="middle">
+                        <text x="42" y="181">00:00</text>
+                        <text x="132" y="181">06:00</text>
+                        <text x="222" y="181">12:00</text>
+                        <text x="312" y="181">18:00</text>
+                        <text x="397" y="181">24:00</text>
+                      </g>
+                    </svg>
+                  </div>
+
+                  <div class="mv-dashboard-table">
+                    <div class="mv-dashboard-table-heading">Sensores de ejemplo</div>
+
+                    <div class="mv-sensor-row">
+                      <div>
+                        <span class="mv-sensor-name">Sensor A · Congelación</span>
+                        <span class="mv-sensor-location">Sucursal Centro · Ubicación ficticia</span>
+                      </div>
+                      <span class="mv-sensor-reading">-18.4 °C</span>
+                    </div>
+
+                    <div class="mv-sensor-row">
+                      <div>
+                        <span class="mv-sensor-name">Sensor B · Refrigeración</span>
+                        <span class="mv-sensor-location">Sucursal Norte · Ubicación ficticia</span>
+                      </div>
+                      <span class="mv-sensor-reading">3.6 °C</span>
+                    </div>
+                  </div>
+
+                  <p class="mv-dashboard-disclaimer">
+                    Datos y lecturas exclusivamente ilustrativos.
+                    No representan equipos conectados ni mediciones en tiempo real.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mv-section mv-section-soft" id="beneficios" aria-labelledby="beneficios-title">
+      <div class="container mv-container">
+        <div class="mb-4">
+          <span class="mv-section-label">Beneficios</span>
+          <h2 class="mv-heading" id="beneficios-title">
+            Un sistema pensado para operar con claridad y control
+          </h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-3">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">📊</div>
+              <h3>Visibilidad operativa</h3>
+              <p>
+                Revisa patrones de temperatura por equipo, zona o sucursal sin perder contexto
+                técnico ni tiempo en reportes dispersos.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">🧾</div>
+              <h3>Historiales organizados</h3>
+              <p>
+                Consulta registros históricos y compara periodos para detectar desviaciones,
+                cambios de rendimiento o incidencias recurrentes.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">🔔</div>
+              <h3>Alertas clave</h3>
+              <p>
+                Identifica variaciones fuera del rango esperado y da seguimiento a eventos
+                relevantes para la operación técnica.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">📁</div>
+              <h3>Descargas rápidas</h3>
+              <p>
+                Exporta y comparte registros de manera práctica para auditoría, análisis o
+                coordinación interna del equipo.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mv-section" id="funcionalidades" aria-labelledby="funcionalidades-title">
+      <div class="container mv-container">
+        <div class="mb-4">
+          <span class="mv-section-label">Funcionalidades</span>
+          <h2 class="mv-heading" id="funcionalidades-title">
+            Todo lo que necesitas para acompañar la operación
+          </h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">🌡️</div>
+              <h3>Monitoreo por sensores</h3>
+              <p>
+                Organiza la información por equipos, ubicaciones y rangos específicos para
+                localizar rápidamente lecturas críticas o estables.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">📈</div>
+              <h3>Gráficas históricas</h3>
+              <p>
+                Visualiza tendencias en intervalos personalizados para analizar comportamiento
+                con mayor claridad y tomar decisiones técnicas.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">🛠️</div>
+              <h3>Seguimiento técnico</h3>
+              <p>
+                Acompaña la operación con datos que permiten evaluar el desempeño de equipos
+                y mantener una trazabilidad útil en la gestión diaria.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mv-section mv-section-soft" id="como-funciona" aria-labelledby="como-funciona-title">
+      <div class="container mv-container">
+        <div class="mb-4">
+          <span class="mv-section-label">Cómo funciona</span>
+          <h2 class="mv-heading" id="como-funciona-title">
+            Una experiencia simple, clara y útil para cada operación
+          </h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">01</div>
+              <h3>Conecta</h3>
+              <p>
+                Centraliza los equipos o sensores asociados a tu operación para organizar la
+                información en una sola vista.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">02</div>
+              <h3>Consulta</h3>
+              <p>
+                Revisa tendencias, comparativos y lecturas por rango de tiempo para detectar
+                comportamientos relevantes con rapidez.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mv-card">
+              <div class="mv-icon" aria-hidden="true">03</div>
+              <h3>Optimiza</h3>
+              <p>
+                Descarga reportes y comparte información útil para mejorar decisiones técnicas
+                y continuidad operacional.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mv-section" id="planes" aria-labelledby="planes-title">
+      <div class="container mv-container">
+        <div class="mb-4">
+          <span class="mv-section-label">Cobertura</span>
+          <h2 class="mv-heading" id="planes-title">
+            Flexibilidad para operar con distintos niveles de supervisión
+          </h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="mv-card">
+              <h3>Starter</h3>
+              <p>
+                Ideal para equipos con monitoreo básico y seguimiento de pocas ubicaciones o
+                sensores.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="mv-card">
+              <h3>Professional</h3>
+              <p>
+                Recomendado para operaciones con más puntos de revisión, historial y coordinación
+                técnica por área.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="mv-card">
+              <h3>Enterprise</h3>
+              <p>
+                Para organizaciones con múltiples ubicaciones, análisis más profundos y gestión
+                centralizada de registros.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mv-stat-grid">
+          <div class="mv-stat">
+            <strong>24/7</strong>
+            <span>Acceso a información operativa</span>
+          </div>
+
+          <div class="mv-stat">
+            <strong>+120</strong>
+            <span>Puntos de supervisión gestionables</span>
+          </div>
+
+          <div class="mv-stat">
+            <strong>3x</strong>
+            <span>Más rapidez en revisión de incidencias</span>
+          </div>
+
+          <div class="mv-stat">
+            <strong>100%</strong>
+            <span>Historial centralizado y consultable</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mv-section mv-section-soft" id="preguntas" aria-labelledby="preguntas-title">
+      <div class="container mv-container">
+        <div class="mb-4">
+          <span class="mv-section-label">Preguntas frecuentes</span>
+          <h2 class="mv-heading" id="preguntas-title">
+            Respuestas rápidas para entender el sistema
+          </h2>
+        </div>
+
+        <div class="accordion" id="faqMonitoreoV5">
+          <div class="accordion-item mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq1"
+                aria-expanded="false"
+              >
+                ¿Se puede consultar el historial por fecha?
+              </button>
+            </h3>
+            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqMonitoreoV5">
+              <div class="accordion-body">
+                Sí. La plataforma está pensada para revisar historiales y compararlos por
+                periodos para detectar evolución del comportamiento operativo.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq2"
+                aria-expanded="false"
+              >
+                ¿Los registros pueden descargarse?
+              </button>
+            </h3>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqMonitoreoV5">
+              <div class="accordion-body">
+                Sí. Una de sus ventajas es permitir exportar y compartir la información para
+                análisis técnico, coordinación o auditoría.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq3"
+                aria-expanded="false"
+              >
+                ¿Es útil para múltiples ubicaciones?
+              </button>
+            </h3>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqMonitoreoV5">
+              <div class="accordion-body">
+                Sí. Está diseñado para facilitar la visión operativa en diferentes sucursales,
+                áreas o equipos que requieren supervisión técnica.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mv-section" id="solicitar-demo">
+      <div class="container mv-container">
+        <div class="mv-cta-card">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+              <span class="mv-section-label">Solicita una demo</span>
+              <h2 class="mv-heading">
+                Quiero ver cómo MonitoreoV5 puede apoyar mi operación
+              </h2>
+            </div>
+
+            <div class="col-lg-4 text-lg-end">
+              <a class="mv-btn mv-btn-accent" href="mailto:demo@monitoreov5.com">
+                Agendar demostración
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container mv-container">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div>
+          <span style="font-size: 1.12rem; font-weight: 800; color: var(--mv-primary-dark);">
+            Monitoreo<span style="color: var(--mv-accent);">V5</span>
+          </span>
+        </div>
+
+        <div style="color: var(--mv-muted); font-size: 0.9rem;">
+          © 2025 MonitoreoV5 · Control y seguimiento de temperatura
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdmekl7Xjv7d6I9B"
+    crossorigin="anonymous"
+  ></script>
+</body>
+</html>
